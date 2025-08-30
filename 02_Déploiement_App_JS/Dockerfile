@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
    && apt-get install -y --no-install-recommends \
-      ca-certificates curl gnupg openjdk-17-jdk git sudo \
+      ca-certificates curl gnupg openjdk-17-jdk git sudo nginx python3 \
     && mkdir -p /usr/share/keyrings \
     && curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key \
        | gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg \
@@ -17,11 +17,14 @@ RUN apt-get update \
 
 
 ENV JENKINS_HOME=/var/lib/jenkins
-EXPOSE 8080
+EXPOSE 8080 3000
 VOLUME ["/var/lib/jenkins"]
 
 # Ajout du droit sudo sans mot de passe pour jenkins
 RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Création du répertoire de déploiement
+RUN mkdir -p /var/www/html && chown -R jenkins:jenkins /var/www/html
 
 RUN chown -R jenkins:jenkins /var/lib/jenkins /var/log/jenkins /var/cache/jenkins || true
 
